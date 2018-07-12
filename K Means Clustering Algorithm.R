@@ -1,3 +1,5 @@
+library(ggplot2)
+
 set.seed(2)
 
 #Setting up the datasets
@@ -17,6 +19,13 @@ centroid1
 centroid2
 centroid3
 centroid4
+
+ggplot(data = data.frame(dataset), aes(x = dataset[,1], y = dataset[,2])) +
+  geom_point(size=2, shape=23) + xlab("X") + ylab("Y") +
+  geom_point(aes(x=centroid1[1], y=centroid1[2]), colour="blue", size=2) +
+  geom_point(aes(x=centroid2[1], y=centroid2[2]), colour="red", size=2) +
+  geom_point(aes(x=centroid3[1], y=centroid3[2]), colour="green", size=2) +
+  geom_point(aes(x=centroid4[1], y=centroid4[2]), colour="black", size=2)
 
 distance <- function(matrix, centroid){
   
@@ -82,3 +91,15 @@ cluster1
 cluster2
 cluster3
 cluster4
+
+ggplot(data = NULL) +
+  geom_point(aes(x=centroid1[1], y=centroid1[2]), colour="blue", size=5) +
+  geom_point(aes(x=cluster1[,1], y=cluster1[,2]), colour="blue", size=2) +
+  geom_point(aes(x=centroid2[1], y=centroid2[2]), colour="red", size=5) +
+  geom_point(aes(x=cluster2[,1], y=cluster2[,2]), colour="red", size=2) +
+  geom_point(aes(x=centroid3[1], y=centroid3[2]), colour="green", size=5) +
+  geom_point(aes(x=cluster3[,1], y=cluster3[,2]), colour="green", size=2) +
+  geom_point(aes(x=centroid4[1], y=centroid4[2]), colour="black", size=5) +
+  geom_point(aes(x=cluster4[,1], y=cluster4[,2]), colour="black", size=2) +
+  xlab("X") + ylab("Y")
+  
