@@ -7,7 +7,6 @@ npoints = 100
 dataset = matrix(data = NA, npoints, 2)
 dataset[,1] = sample(1:100, npoints)
 dataset[,2] = sample(1:100, npoints)
-dataset
 
 #initialize centroids to random values
 centroid1 = sample(1:100, 2)
@@ -15,17 +14,12 @@ centroid2 = sample(1:100, 2)
 centroid3 = sample(1:100, 2)
 centroid4 = sample(1:100, 2)
 
-centroid1
-centroid2
-centroid3
-centroid4
-
-ggplot(data = data.frame(dataset), aes(x = dataset[,1], y = dataset[,2])) +
-  geom_point(size=2, shape=23) + xlab("X") + ylab("Y") +
-  geom_point(aes(x=centroid1[1], y=centroid1[2]), colour="blue", size=2) +
-  geom_point(aes(x=centroid2[1], y=centroid2[2]), colour="red", size=2) +
-  geom_point(aes(x=centroid3[1], y=centroid3[2]), colour="green", size=2) +
-  geom_point(aes(x=centroid4[1], y=centroid4[2]), colour="black", size=2)
+# ggplot(data = data.frame(dataset), aes(x = dataset[,1], y = dataset[,2])) +
+#   geom_point(size=2, shape=23) + xlab("X") + ylab("Y") +
+#   geom_point(aes(x=centroid1[1], y=centroid1[2]), colour="blue", size=2) +
+#   geom_point(aes(x=centroid2[1], y=centroid2[2]), colour="red", size=2) +
+#   geom_point(aes(x=centroid3[1], y=centroid3[2]), colour="green", size=2) +
+#   geom_point(aes(x=centroid4[1], y=centroid4[2]), colour="black", size=2)
 
 distance <- function(matrix, centroid){
   
@@ -43,11 +37,6 @@ distances2 = distance(dataset, centroid2)
 distances3 = distance(dataset, centroid3)
 distances4 = distance(dataset, centroid4)
 
-distances1
-distances2
-distances3
-distances4
-
 all4distances = matrix(ncol = npoints, nrow = 4)
 
 all4distances[1,] = distances1
@@ -55,15 +44,11 @@ all4distances[2,] = distances2
 all4distances[3,] = distances3
 all4distances[4,] = distances4
 
-all4distances
-
 clusterAssignment = vector()
 
 for(i in 1:npoints){
   clusterAssignment[i] = which.min(all4distances[,i])
 }
-
-clusterAssignment
 
 cluster1 = matrix(data = NA, npoints, ncol = 2)
 cluster2 = matrix(data = NA, npoints, ncol = 2)
@@ -87,11 +72,6 @@ cluster2 = cluster2[rowSums(is.na(cluster2)) != ncol(cluster2), ]
 cluster3 = cluster3[rowSums(is.na(cluster3)) != ncol(cluster3), ]
 cluster4 = cluster4[rowSums(is.na(cluster4)) != ncol(cluster4), ]
 
-cluster1
-cluster2
-cluster3
-cluster4
-
 ggplot(data = NULL) +
   geom_point(aes(x=centroid1[1], y=centroid1[2]), colour="blue", size=5) +
   geom_point(aes(x=cluster1[,1], y=cluster1[,2]), colour="blue", size=2) +
@@ -102,4 +82,15 @@ ggplot(data = NULL) +
   geom_point(aes(x=centroid4[1], y=centroid4[2]), colour="black", size=5) +
   geom_point(aes(x=cluster4[,1], y=cluster4[,2]), colour="black", size=2) +
   xlab("X") + ylab("Y")
-  
+
+for(i in 1:2){  
+  centroid1[i] = mean(cluster1[,i])
+  centroid2[i] = mean(cluster2[,i])
+  centroid3[i] = mean(cluster3[,i])
+  centroid4[i] = mean(cluster4[,i])
+}
+
+centroid1
+centroid2
+centroid3
+centroid4
