@@ -56,16 +56,16 @@ cluster3 = matrix(data = NA, npoints, ncol = 2)
 cluster4 = matrix(data = NA, npoints, ncol = 2)
 
 for(i in 1:npoints){
-    if(clusterAssignment[i] == 1){
-      cluster1[i,] = dataset[i,]
-    } else if(clusterAssignment[i] == 2){
-      cluster2[i,] = dataset[i,]
-    } else if(clusterAssignment[i] == 3){
-      cluster3[i,] = dataset[i,]
-    } else if(clusterAssignment[i] == 4){
-      cluster4[i,] = dataset[i,]
-    }
+  if(clusterAssignment[i] == 1){
+    cluster1[i,] = dataset[i,]
+  } else if(clusterAssignment[i] == 2){
+    cluster2[i,] = dataset[i,]
+  } else if(clusterAssignment[i] == 3){
+    cluster3[i,] = dataset[i,]
+  } else if(clusterAssignment[i] == 4){
+    cluster4[i,] = dataset[i,]
   }
+}
 
 cluster1 = cluster1[rowSums(is.na(cluster1)) != ncol(cluster1), ]
 cluster2 = cluster2[rowSums(is.na(cluster2)) != ncol(cluster2), ]
