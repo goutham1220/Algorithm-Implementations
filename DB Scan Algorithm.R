@@ -2,7 +2,7 @@ library(ggplot2)
 
 set.seed(2)
 
-radius = 35
+radius = 35/3
 minPoints = 4
 dataset = matrix(data = NA, npoints, 2)
 dataset[,1] = sample(1:100, npoints)
