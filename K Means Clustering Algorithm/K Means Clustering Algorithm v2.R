@@ -3,17 +3,17 @@ library(ggplot2)
 set.seed(2)
 
 #Setting up the datasets
-numPoints = 200
-numClusters = 5
-numIterations = 10
+numPoints = 100
+numClusters = 6
+numIterations = 20
 
 distance <- function(matrix, centroid){
   
   dist = vector()
   
-  for(i in 1:nrow(matrix)){
-    dist[i] = sqrt((centroid[1] - matrix[i,1])^2 + (centroid[2] - matrix[i,2])^2)
-  }
+   dist = apply(matrix, MARGIN = 1, FUN = function(x){
+     centroid = centroid[1:2]
+     sqrt(sum((centroid - x)^2))})
   
   return(dist)
 }
@@ -21,12 +21,13 @@ distance <- function(matrix, centroid){
 kmeans_simulation = function(npoints, nclusters, niterations){
   
   dataset = matrix(data = NA, npoints, 2)
-  dataset[,1:2] = sample(1:100, npoints * 2, replace = TRUE)
+  dataset[,1] = rnorm(npoints, mean = 0, sd = 1)
+  dataset[,2] = rnorm(npoints, mean = 0, sd = 1)
   dataset_init = dataset
   
   # initialize centroids to random values
   centroids = matrix(data = NA, nrow = nclusters, ncol = 3)
-  centroids[,1:2] =  sample(1:100, nclusters * 2)
+  centroids[,1:2] =  rnorm(nclusters * 2, mean = init_clusters, sd = 1/init_clusters)
   centroids[,3] = 1:nrow(centroids)
   
   centroids_init = centroids
@@ -64,7 +65,7 @@ list = kmeans_simulation(numPoints, numClusters, numIterations)
 ggplot(data = NULL) +
   geom_point(size=2, shape="23") + xlab("X") + ylab("Y") +
   geom_point(aes(x=list[[5]][,1], y=list[[5]][,2]), colour=list[[5]][,3], size=5) +
-  geom_point(aes(x=list[[6]][,1], y=list[[6]][,2]), colour="white") 
+  geom_point(aes(x=list[[6]][,1], y=list[[6]][,2]), colour="black",fill = "white", pch=21, size=2) 
 
 ggplot(data = NULL) +
   geom_point(aes(x=list[[3]][,1], y=list[[3]][,2]), colour=list[[3]][,3], size=5) +
@@ -74,4 +75,3 @@ ggplot(data = NULL) +
 ggplot(data = NULL) +
   geom_line(aes(x=1:numIterations, y=list[[1]])) +
   xlab("# of Iterations") + ylab("Cost")
-
