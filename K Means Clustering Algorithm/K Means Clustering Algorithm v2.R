@@ -27,7 +27,7 @@ kmeans_simulation = function(npoints, nclusters, niterations){
   
   # initialize centroids to random values
   centroids = matrix(data = NA, nrow = nclusters, ncol = 3)
-  centroids[,1:2] =  rnorm(nclusters * 2, mean = init_clusters, sd = 1/init_clusters)
+  centroids[,1:2] =  rnorm(nclusters * 2, mean = 0, sd = 1)
   centroids[,3] = 1:nrow(centroids)
   
   centroids_init = centroids
