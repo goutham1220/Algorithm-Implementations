@@ -1,11 +1,14 @@
 library(ggplot2)
 
-set.seed(2)
+set.seed(6)
 
 #Setting up the datasets
 numPoints = 100
+numClusters.data = 4
 numClusters = 4
-numIterations = 20
+numIterations = 10
+meanValue = 50
+spread = 4
 
 distance <- function(matrix, centroid){
   
@@ -18,69 +21,63 @@ distance <- function(matrix, centroid){
   return(dist)
 }
 
-kmeans_simulation = function(npoints, nclusters, niterations){
+kmeans_simulation = function(npoints, nclusters, niterations, nclusters.data = 4, spread = 5){
   
-  dataset = matrix(data = NA, npoints, 2)
-  dataset[,1] = rnorm(npoints, mean = 0, sd = 1)
-  dataset[,2] = rnorm(npoints, mean = 0, sd = 1)
-  dataset_init = dataset
+  xvalues = vector()
+  yvalues = vector()
   
+  for(i in 1:nclusters.data){
+    xvalues = c(xvalues, rnorm(npoints/nclusters.data, mean = (25*i), sd = spread))
+    yvalues = c(yvalues, rnorm(npoints/nclusters.data, mean = (100*i)/nclusters.data, sd = spread))
+  }
+  
+  dataset = cbind(xvalues, yvalues)
+
   # initialize centroids to random values
   centroids = matrix(data = NA, nrow = nclusters, ncol = 3)
-  centroids[,1:2] =  rnorm(nclusters * 2, mean = 0, sd = 1)
+  # centroids[,1:2] =  rnorm(nclusters * 2, mean = meanValue, sd = spread)
+  centroids[,1:2] =  dataset[sample(1:npoints, nclusters),]
   centroids[,3] = 1:nrow(centroids)
   
   centroids_init = centroids
-  
-  ggplot(data = NULL, aes(x = dataset[,1], y = dataset[,2])) +
-    geom_point(size=2, shape=23) + xlab("X") + ylab("Y") +
-    geom_point(aes(x = data.frame(dataset[,1]), y = data.frame(dataset[,2])), color = "white") + 
-    geom_point(aes(x=centroids[,1], y=centroids[,2]), colour=centroids[,3], size=3)
-  
-  alldistances = matrix(nrow = npoints, ncol = nclusters)
-  clusterAssignment = vector()
   cost = vector()
   
   for(j in 1:niterations){
     
     alldistances = apply(centroids, MARGIN = 1, distance, matrix = dataset)
     clusterAssignment = apply(alldistances, MARGIN = 1, which.min)
-    
-    for(i in 1:nclusters){
-      cost[j] = sum(distance(dataset[clusterAssignment == i,], centroids[i,]))
-    }
-    
-    for(i in 1:nclusters){  
-      centroids[i,1] = mean(dataset[clusterAssignment == i,1])
-      centroids[i,2] = mean(dataset[clusterAssignment == i,2])
-    }
-    
+    cost[j] = sum(sapply(1:nclusters, 
+                         function(x) sum(distance(dataset[clusterAssignment == x,], centroids[x,]))))
+    centroids[,1:2] = sapply(1:nclusters, 
+                             function(x) mean(dataset[clusterAssignment == x,1:2]))
+
   }
   
-  return (list(cost, clusterAssignment, centroids, dataset, centroids_init, dataset_init))
+  return (list(cost, clusterAssignment, centroids, dataset, centroids_init))
 }
 
-list = kmeans_simulation(numPoints, numClusters, numIterations)
+list = kmeans_simulation(numPoints, numClusters, numIterations, numClusters.data, spread)
 
-# ggplot(data = NULL) +
-#   geom_point(size=2, shape="23") + xlab("X") + ylab("Y") +
-#   geom_point(aes(x=list[[5]][,1], y=list[[5]][,2]), colour=list[[5]][,3], size=5) +
-#   geom_point(aes(x=list[[6]][,1], y=list[[6]][,2]), colour="black",fill = "white", pch=21, size=2) 
-# 
-# ggplot(data = NULL) +
-#   geom_point(aes(x=list[[3]][,1], y=list[[3]][,2]), colour=list[[3]][,3], size=5) +
-#   geom_point(aes(x=list[[4]][,1], y=list[[4]][,2]), colour=list[[2]], size=2) +
-#   xlab("X") + ylab("Y")
-# 
-# ggplot(data = NULL) +
-#   geom_line(aes(x=1:numIterations, y=list[[1]])) +
-#   xlab("# of Iterations") + ylab("Cost")
+ggplot(data = NULL) +
+  geom_point(size=2, shape="23") + xlab("X") + ylab("Y") +
+  geom_point(aes(x=list[[5]][,1], y=list[[5]][,2]), colour=list[[5]][,3], size=5) +
+  geom_point(aes(x=list[[4]][,1], y=list[[4]][,2]), colour="black",fill = "white", pch=21, size=2)
 
-cost = vector()
+Sys.sleep(2)
 
-for(i in 1:numClusters){
-  numClusters = i
-  costList = kmeans_simulation(numPoints, numClusters, numIterations)[[1]]
+ggplot(data = NULL) +
+  geom_point(aes(x=list[[3]][,1], y=list[[3]][,2]), colour=list[[3]][,3], size=5) +
+  geom_point(aes(x=list[[4]][,1], y=list[[4]][,2]), colour=list[[2]], size=2) +
+  xlab("X") + ylab("Y")
+
+ggplot(data = NULL) +
+  geom_line(aes(x=1:numIterations, y=list[[1]])) +
+  xlab("# of Iterations") + ylab("Cost")
+
+costList = vector()
+
+for(i in 1:10){
+  costList[i] = kmeans_simulation(numPoints, i, numIterations, numClusters.data, spread)[[1]][numIterations]
 }
 
 ggplot(data = NULL) +
