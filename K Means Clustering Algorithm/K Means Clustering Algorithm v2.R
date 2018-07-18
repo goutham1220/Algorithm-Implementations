@@ -4,7 +4,7 @@ set.seed(2)
 
 #Setting up the datasets
 numPoints = 100
-numClusters = 6
+numClusters = 4
 numIterations = 20
 
 distance <- function(matrix, centroid){
@@ -43,7 +43,7 @@ kmeans_simulation = function(npoints, nclusters, niterations){
   
   for(j in 1:niterations){
     
-    alldistances = apply(centroids[,1:2], MARGIN = 1, distance, matrix = dataset)
+    alldistances = apply(centroids, MARGIN = 1, distance, matrix = dataset)
     clusterAssignment = apply(alldistances, MARGIN = 1, which.min)
     
     for(i in 1:nclusters){
@@ -62,16 +62,27 @@ kmeans_simulation = function(npoints, nclusters, niterations){
 
 list = kmeans_simulation(numPoints, numClusters, numIterations)
 
-ggplot(data = NULL) +
-  geom_point(size=2, shape="23") + xlab("X") + ylab("Y") +
-  geom_point(aes(x=list[[5]][,1], y=list[[5]][,2]), colour=list[[5]][,3], size=5) +
-  geom_point(aes(x=list[[6]][,1], y=list[[6]][,2]), colour="black",fill = "white", pch=21, size=2) 
+# ggplot(data = NULL) +
+#   geom_point(size=2, shape="23") + xlab("X") + ylab("Y") +
+#   geom_point(aes(x=list[[5]][,1], y=list[[5]][,2]), colour=list[[5]][,3], size=5) +
+#   geom_point(aes(x=list[[6]][,1], y=list[[6]][,2]), colour="black",fill = "white", pch=21, size=2) 
+# 
+# ggplot(data = NULL) +
+#   geom_point(aes(x=list[[3]][,1], y=list[[3]][,2]), colour=list[[3]][,3], size=5) +
+#   geom_point(aes(x=list[[4]][,1], y=list[[4]][,2]), colour=list[[2]], size=2) +
+#   xlab("X") + ylab("Y")
+# 
+# ggplot(data = NULL) +
+#   geom_line(aes(x=1:numIterations, y=list[[1]])) +
+#   xlab("# of Iterations") + ylab("Cost")
+
+cost = vector()
+
+for(i in 1:numClusters){
+  numClusters = i
+  costList = kmeans_simulation(numPoints, numClusters, numIterations)[[1]]
+}
 
 ggplot(data = NULL) +
-  geom_point(aes(x=list[[3]][,1], y=list[[3]][,2]), colour=list[[3]][,3], size=5) +
-  geom_point(aes(x=list[[4]][,1], y=list[[4]][,2]), colour=list[[2]], size=2) +
-  xlab("X") + ylab("Y")
-
-ggplot(data = NULL) +
-  geom_line(aes(x=1:numIterations, y=list[[1]])) +
-  xlab("# of Iterations") + ylab("Cost")
+  geom_line(aes(x = 1:length(costList), y = costList)) +
+  xlab("# of Clusters") + ylab("Cost")
