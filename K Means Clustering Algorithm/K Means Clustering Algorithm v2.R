@@ -3,18 +3,15 @@ library(ggplot2)
 set.seed(6)
 
 #Setting up the datasets
-numPoints = 100
-numClusters.data = 4
-numClusters = 4
+numPoints = 200
+numClusters.data = 5
+numClusters = 5
 numIterations = 10
-meanValue = 50
 spread = 4
 
 distance <- function(matrix, centroid){
   
-  dist = vector()
-  
-   dist = apply(matrix, MARGIN = 1, FUN = function(x){
+  dist = apply(matrix, MARGIN = 1, FUN = function(x){
      centroid = centroid[1:2]
      sqrt(sum((centroid - x)^2))})
   
@@ -34,10 +31,10 @@ kmeans_simulation = function(npoints, nclusters, niterations, nclusters.data = 4
   dataset = cbind(xvalues, yvalues)
 
   # initialize centroids to random values
-  centroids = matrix(data = NA, nrow = nclusters, ncol = 3)
-  # centroids[,1:2] =  rnorm(nclusters * 2, mean = meanValue, sd = spread)
-  centroids[,1:2] =  dataset[sample(1:npoints, nclusters),]
-  centroids[,3] = 1:nrow(centroids)
+  # xy =  rnorm(nclusters * 2, mean = meanValue, sd = spread)
+  xy =  dataset[sample(1:npoints, nclusters),]
+  color = 1:nrow(xy)
+  centroids = cbind(xy, color)
   
   centroids_init = centroids
   cost = vector()
@@ -70,16 +67,18 @@ ggplot(data = NULL) +
   geom_point(aes(x=list[[4]][,1], y=list[[4]][,2]), colour=list[[2]], size=2) +
   xlab("X") + ylab("Y")
 
+Sys.sleep(2)
+
 ggplot(data = NULL) +
   geom_line(aes(x=1:numIterations, y=list[[1]])) +
   xlab("# of Iterations") + ylab("Cost")
 
 costList = vector()
 
-for(i in 1:10){
+for(i in 2:10){
   costList[i] = kmeans_simulation(numPoints, i, numIterations, numClusters.data, spread)[[1]][numIterations]
 }
 
 ggplot(data = NULL) +
-  geom_line(aes(x = 1:length(costList), y = costList)) +
+  geom_line(aes(x = 2:length(costList), y = costList[2:length(costList)])) +
   xlab("# of Clusters") + ylab("Cost")
