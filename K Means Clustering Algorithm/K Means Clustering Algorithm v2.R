@@ -24,8 +24,10 @@ kmeans_simulation = function(npoints, nclusters, niterations, nclusters.data = 4
   yvalues = vector()
   
   for(i in 1:nclusters.data){
-    xvalues = c(xvalues, rnorm(npoints/nclusters.data, mean = (25*i), sd = spread))
-    yvalues = c(yvalues, rnorm(npoints/nclusters.data, mean = (100*i)/nclusters.data, sd = spread))
+    xvalues = sample(1:100, npoints, replace = TRUE)
+    yvalues = sample(1:100, npoints, replace = TRUE)
+    # xvalues = c(xvalues, rnorm(npoints/nclusters.data, mean = (25*i), sd = spread))
+    # yvalues = c(yvalues, rnorm(npoints/nclusters.data, mean = (100*i)/nclusters.data, sd = spread))
   }
   
   dataset = cbind(xvalues, yvalues)
