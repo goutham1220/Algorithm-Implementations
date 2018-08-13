@@ -4,6 +4,7 @@ set.seed(2)
 
 radius = 35/3
 minPoints = 4
+npoints = 100
 dataset = matrix(data = NA, npoints, 2)
 dataset[,1] = sample(1:100, npoints)
 dataset[,2] = sample(1:100, npoints)
@@ -14,11 +15,11 @@ isCluster = matrix(data = NA, nrow = 100, ncol = 2)
 randValue = vector()
 randValue[1:2] = sample(1:100, 2)
 
-randValue[3] = 1
+randValue[3] = 5
 
-ggplot(data = NULL, aes(x = dataset[,1], y = dataset[,2])) +
+ggplot(data = NULL) +
   geom_point(size=2, shape=23) + xlab("X") + ylab("Y") +
-  geom_point(aes(x = data.frame(dataset[,1]), y = data.frame(dataset[,2])), color = "white") + 
+  geom_point(aes(x = dataset[,1], y = dataset[,2]), color = "black") + 
   geom_point(aes(x=randValue[1], y=randValue[2]), colour=randValue[3], size=3)
 
 distance <- function(matrix, randomValue){
@@ -51,14 +52,14 @@ for(i in 1:nrow(dataset)){
 
 for(i in 1:nrow(dataset)){
   if(isCluster[i,1] == 1){
-      cluster[i,] = dataset[i,]
-     # cluster = rbind(cluster, dataset[i,])
+      #cluster[i,] = dataset[i,]
+     cluster = rbind(cluster, dataset[i,])
   }
 }
 
-ggplot(data = NULL, aes(x = dataset[,1], y = dataset[,2])) +
+ggplot(data = NULL) +
   geom_point(size=2, shape=23) + xlab("X") + ylab("Y") +
-  geom_point(aes(x = data.frame(dataset[,1]), y = data.frame(dataset[,2])), color = "white") + 
+  geom_point(aes(x = dataset[,1], y = dataset[,2]), color = "black") + 
   geom_point(aes(x=randValue[1], y=randValue[2]), colour=randValue[3], size=3) +
   geom_point(aes(x=cluster[, 1], y=cluster[, 2], colour=randValue[3], size=3))
 
