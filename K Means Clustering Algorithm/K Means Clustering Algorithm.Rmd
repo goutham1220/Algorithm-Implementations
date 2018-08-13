@@ -2,12 +2,12 @@
 title: "k-Means Clustering Algorithm"
 author: "Goutham Swaminathan"
 output: pdf_document
+encoding: utf-8
 ---
 
 #Introduction
  The *k*-Means Clustering Algorithm is an unsupervised statistical learning method to classify data points into clusters. The term *unsupervised* refers to the fact that the algorithm is not given any verification of whether its result is correct or not. 
  
-
 #Explanation
  In order to implement this algorithm and apply it to a dataset, we will need to do the following:
   1.  Simulate data in the form of a 2-dimensional scatter plot.
@@ -19,6 +19,17 @@ output: pdf_document
   7.  Reassign each centroid to the mean position of its respective cluster.
   8.  Rerun the algorithm until mean distance between points and centroids is minimized. 
  
+```{r, include=FALSE}
+library(knitr)
+library(ggplot2)
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+set.seed(10)
+``` 
+ 
+```{r setup, echo=FALSE} 
+options(width=80)
+``` 
+ 
 ```{r}
 numPoints = 200
 numClusters.data = 5
@@ -28,7 +39,7 @@ spread = 4
 meanValue = 50
 ```
 
-We first initialize variables for the number of points, number of inherent clusters in the data, number of desired clusters, number of iterations OF KMEANS, and the spread of the data. Initializing these variables allows for the most customization of the algorithm when testing it with data. 
+We first initialize variables for the number of points, number of inherent clusters in the data, number of desired clusters, number of iterations OF *k*-means, and the spread of the data. Initializing these variables allows for the most customization of the algorithm when testing it with data. 
 
 We will then create a *distance()* function to calculate the distance between every point in an NX2 matrix and a centroid. We will first define the **dist** variable which will hold a matrix of distances, with each row containing the distances for a different centroid. Using the *apply()* function, we will set the **X** parameter to **matrix** and the **MARGIN** parameter to 1 (because we want to apply the function across every row, where each row represents the coordinates of one point). We will then create our own function withIN the *apply()* function, in which we set the **centroid** variable to the first two elements of the **centroid** vector. This is due to the fact that later in the program, we will use the 3rd column of the **centroids** matrix to hold the color of each centroid. In addition, this **centroid** variable is a vector rather than a matrix because in our *kmeans_simulation()* function, we will apply this function to every row of the **centroids** matrix. Afterwards, we will calculate the total square difference between the *x* and *y* values for the **centroid** and **x** variables. Finally, we will return the **dist** vector.
 
@@ -55,15 +66,18 @@ Now, we can begin creating our *kmeans_simulation()* function, which will handle
 ```{r}
 library(ggplot2)
 
-kmeans_simulation = function(npoints, nclusters, niterations, nclusters.data = 4, spread = 5, meanValue = 50){
+kmeans_simulation = function(npoints, nclusters, 
+                             niterations, nclusters.data = 4, spread = 5, meanValue = 50){
 
   xvalues = vector() #initialize a vector of x values
   yvalues = vector() #initialize a vector of y values
   
   for(i in 1:nclusters.data){ # run following code for every inherent cluster
    ## generates random X and Y values
-    xvalues = c(xvalues, rnorm(npoints/nclusters.data, mean = (25*i), sd = spread)) #clustered x values
-    yvalues = c(yvalues, rnorm(npoints/nclusters.data, mean = (100*i)/nclusters.data, sd = spread)) # clustered y values
+    xvalues = c(xvalues, rnorm(npoints/nclusters.data, 
+                               mean = (25*i), sd = spread)) #clustered x values
+    yvalues = c(yvalues, rnorm(npoints/nclusters.data, # clustered y values
+                               mean = (100*i)/nclusters.data, sd = spread)) 
     # xvalues = sample(1:100, npoints, replace = TRUE) # scattered x values
     # yvalues = sample(1:100, npoints, replace = TRUE) # scattered y values
   }
@@ -71,7 +85,7 @@ kmeans_simulation = function(npoints, nclusters, niterations, nclusters.data = 4
   # binds X and Y values into a matrix
   dataset = cbind(xvalues, yvalues)
 
-  xy =  dataset[sample(1:npoints, nclusters),] # initializes centroids to random pts from dataset
+  xy =  dataset[sample(1:npoints, nclusters),] # sets centroids to random pts from dataset
   color = 1:nrow(xy) 
   centroids = cbind(xy, color) # binds color vector for coloring centroids
   
@@ -80,23 +94,35 @@ kmeans_simulation = function(npoints, nclusters, niterations, nclusters.data = 4
   
   for(j in 1:niterations){ # runs for specified number of iterations
     
-    alldistances = apply(centroids, MARGIN = 1, distance, matrix = dataset) #uses apply() to calculate distances between centroids & datapts
-    clusterAssignment = apply(alldistances, MARGIN = 1, which.min) # assigns datapt to cluster based on min distance
-    cost[j] = sum(sapply(1:nclusters, # uses sapply() and sum() to track cost using total distances
-                         function(x) sum(distance(dataset[clusterAssignment == x,], centroids[x,]))))
-    centroids[,1:2] = sapply(1:nclusters, # uses sapply() to reassign centroid coordinates to mean of dataset coordinates
+    #uses apply() to calculate distances between centroids & datapts
+    alldistances = apply(centroids, MARGIN = 1, distance, matrix = dataset) 
+    
+    # assigns datapt to cluster based on min distance
+    clusterAssignment = apply(alldistances, MARGIN = 1, which.min) 
+    
+    # uses sapply() and sum() to track cost using total distances
+    cost[j] = sum(sapply(1:nclusters, 
+                         function(x) 
+                           sum(distance(dataset[clusterAssignment == x,], centroids[x,]))
+                         ))
+    
+    # uses sapply() to reassign centroid coordinates to mean of datapoint coordinates
+    centroids[,1:2] = sapply(1:nclusters,  
                              function(x) mean(dataset[clusterAssignment == x,1:2]))
 
   }
   
-  return (list(cost, clusterAssignment, centroids, dataset, centroids_init)) # returns list of various values
+  # returns list of various values
+  return (list(cost, clusterAssignment, centroids, dataset, centroids_init)) 
 }
 ```
 
 Now that we have written our function, we can implement it. We will first start by creating a **list** variable which will hold the *list* output of our call to the *kmeans_simulation()* function.  
 
 ```{r}
-list = kmeans_simulation(numPoints, numClusters, numIterations, numClusters.data, spread, meanValue)
+list = kmeans_simulation(
+  numPoints, numClusters, numIterations, numClusters.data, spread, meanValue
+  )
 ```
 
 Using the *ggplot()* function, we can use *geom_point()* to first plot the initial clusters, which is the 5th element of **list**, as well as the data itself, which is the 4th element of **list**.
@@ -105,7 +131,7 @@ Using the *ggplot()* function, we can use *geom_point()* to first plot the initi
 ggplot(data = NULL) +
   geom_point(size=2, shape="23") + xlab("X") + ylab("Y") +
   geom_point(aes(x=list[[5]][,1], y=list[[5]][,2]), colour=list[[5]][,3], size=5) +
-  geom_point(aes(x=list[[4]][,1], y=list[[4]][,2]), colour="black",fill = "white", pch=21, size=2)
+  geom_point(aes(x=list[[4]][,1], y=list[[4]][,2]), colour="black", pch=21, size=2)
 ```
 
 The *Sys.sleep()* function allows us to delay execution of a code sample by a specified period of time so that we can view a previous plot (in this case) before a new plot is generated. In this case, since we will use *Sys.sleep(2)*, the program will delay generating the next plot by 2 seconds.
@@ -147,7 +173,8 @@ We will now plot "# of Clusters vs. Cost" by first creating a **costList** vecto
 costList = vector()
 
 for(i in 2:10){
-  costList[i] = kmeans_simulation(numPoints, i, numIterations, numClusters.data, spread)[[1]][numIterations]
+  costList[i] = kmeans_simulation(
+    numPoints, i, numIterations, numClusters.data, spread)[[1]][numIterations]
 }
 ```
 
@@ -160,7 +187,7 @@ ggplot(data = NULL) +
 
 ```
 
-As we can see, the graph appears to plateau at 5 clusters, which is the optimal number of clusters for this simulation.
+As we can see, the graph looks like an elbow, with the "elbow joint" appearing at 6 clusters. This "elbow plot" shows that after more than 6 clusters, the cost does not decrease notably, so the optimal number of clusters for this data is 6.
 
 #Conclusion
 Thank you for taking the time to read this explanation for the "K Means Clustering Algorithm". For more information about the algorithm, please visit this link. Link: https://www.naftaliharris.com/blog/visualizing-k-means-clustering/. This explanation and the included code is **100% my original work**. Please feel free to visit my GitHub page at http://github.com/goutham1220 where I will be posting more explanations as well as other statistics and data science-related resources. In addition, please feel free to visit my YouTube channels "GSDataScience" (http://bit.ly/gsdatascience), where I will be posting more data science and statistics-related videos, and "Gooth" (http://youtube.com/gooth), where I post more cinematic-style, slice-of-life videos.    
